@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Management System</title>
+  <style>
+    body {
+      background-image: url("img/marketing.png");
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th,
+    td {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .highlight {
+      background-color: yellow;
+    }
+
+    .search-bar {
+      float: right;
+      margin-top: 10px;
+      border-radius: 10px;
+      backdrop-filter: blur(5px);
+      margin: 20px;
+      padding: 20px
+    }
+
+    .form {
+      text-align: left;
+      max-width: 200px;
+      margin: 20px;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: azure;
+    }
+
+    tbody {
+      background-color: white;
+    }
+
+    h2 {
+
+      top: 20%;
+      left: 30%;
+      color: white;
+      backdrop-filter: blur(2px);
+      padding-right: 20px;
+      padding-left: 20px;
+      font-size: 35px;
+    }
+    input{
+      border-radius: 5px;
+      border-color: skyblue;
+      padding: 1px 2px;
+    }
+
+  </style>
+</head>
+
+<body>
+  <center>
+    <h2>Student Management System</h2>
+  </center>
+  <div class="search-bar">
+    <input type="text" id="searchRegistrationNumber" placeholder="Search Registration Number">
+    <button onclick="searchStudent()">Search</button>
+  </div>
+
+  <div class="form">
+    <input type="text" id="registrationNumber" placeholder="Registration Number">
+    <input type="text" id="studentName" placeholder="Student Name">
+    <input type="date" id="studentDOB" placeholder="Date of Birth">
+    <input type="text" id="studentBranch" placeholder="Branch">
+    <button onclick="addOrUpdateStudent()">Add Student</button>
+  </div>
+  <table id="studentTable">
+    <thead>
+      <tr>
+        <th>Registration Number</th>
+        <th>Name</th>
+        <th>Date of Birth</th>
+        <th>Branch</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Student data will be inserted here dynamically -->
+    </tbody>
+  </table>
+
+
+  <script>
+    // Array to store student data
+    let students = [];
+
+    // Function to add or update a student
+    function addOrUpdateStudent() {
+      const registrationNumber = document.getElementById("registrationNumber").value;
+      const name = document.getElementById("studentName").value;
+      const dob = document.getElementById("studentDOB").value;
+      const branch = document.getElementById("studentBranch").value;
+
+      if (registrationNumber && name && dob && branch) {
+        const existingStudentIndex = students.findIndex(student => student.registrationNumber === registrationNumber);
+        if (existingStudentIndex !== -1) {
+          // Update existing student
+          students[existingStudentIndex] = { registrationNumber, name, dob, branch };
+        } else {
+          // Add new student
+          students.push({ registrationNumber, name, dob, branch });
+        }
+        displayStudents();
+        clearInputFields();
+      } else {
+        alert("Please enter registration number, name, date of birth, and branch");
+      }
+    }
+
+    // Function to remove a student by registration number
+    function removeStudent(registrationNumber) {
+      students = students.filter(student => student.registrationNumber !== registrationNumber);
+      displayStudents();
+    }
+
+    // Function to edit a student's details
+    function editStudent(registrationNumber) {
+      const student = students.find(student => student.registrationNumber === registrationNumber);
+      if (student) {
+        document.getElementById("registrationNumber").value = student.registrationNumber;
+        document.getElementById("studentName").value = student.name;
+        document.getElementById("studentDOB").value = student.dob;
+        document.getElementById("studentBranch").value = student.branch;
+      } else {
+        alert("Student not found");
+      }
+    }
+
+    // Function to clear input fields
+    function clearInputFields() {
+      document.getElementById("registrationNumber").value = "";
+      document.getElementById("studentName").value = "";
+      document.getElementById("studentDOB").value = "";
+      document.getElementById("studentBranch").value = "";
+    }
+
+    // Function to display students in the table
+    function displayStudents() {
+      const tableBody = document.querySelector("#studentTable tbody");
+      tableBody.innerHTML = "";
+      students.forEach(student => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+                <td>${student.registrationNumber}</td>
+                <td>${student.name}</td>
+                <td>${student.dob}</td>
+                <td>${student.branch}</td>
+                <td>
+                    <button onclick="removeStudent('${student.registrationNumber}')">Remove</button>
+                    <button onclick="editStudent('${student.registrationNumber}')">Edit</button>
+                </td>
+            `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Function to search for a student by registration number
+    function searchStudent() {
+      const searchValue = document.getElementById("searchRegistrationNumber").value;
+      const student = students.find(student => student.registrationNumber === searchValue);
+      if (student) {
+        displayStudents();
+        highlightRow(searchValue);
+      } else {
+        alert("Student not found");
+      }
+    }
+
+    // Function to highlight the row of the searched student
+    function highlightRow(registrationNumber) {
+      const tableRows = document.querySelectorAll("#studentTable tbody tr");
+      tableRows.forEach(row => {
+        if (row.cells[0].textContent === registrationNumber) {
+          row.classList.add("highlight");
+        } else {
+          row.classList.remove("highlight");
+        }
+      });
+    }
+
+    // Initial display
+    displayStudents();
+  </script>
+
+</body>
+
+</html>
